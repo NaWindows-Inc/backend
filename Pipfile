@@ -8,6 +8,12 @@ pylint = "*"
 
 [packages]
 flask = "*"
+flask-migrate = "*"
+mysql-connector = "*"
+flask-sqlalchemy = "*"
+python-dotenv = "*"
+flask-script = "*"
+pymysql = "*"
 
 [requires]
 python_version = "3.8"

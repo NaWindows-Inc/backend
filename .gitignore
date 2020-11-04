@@ -5,3 +5,7 @@
 
 text.txt
 Pipfile.lock
+
+**/.env
+
+**/migrations
