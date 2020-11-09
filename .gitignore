@@ -5,6 +5,7 @@
 
 text.txt
 Pipfile.lock
+**test.py
 
 **/.env
 

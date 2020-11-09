@@ -3,8 +3,25 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
-class Configuration(object):
+class Development(object):
+    """
+    Development environment configurations
+    """
     DEBUG = True
-    ENV = '.env'
-    SQLALCHEMY_DATABASE_URI = getenv("DATABASE_URI", "NOT_FOUND")
+    TESTING = True
+    SQLALCHEMY_DATABASE_URI = getenv("DATABASE_URL", "NOT_FOUND")
     SQLALCHEMY_TRACK_MODIFICATIONS = False
+    ENV = 'development'
+    FLASK_APP = 'main.py'
+
+
+class Production(object):
+    """
+    Production environment configurations
+    """
+    DEBUG = False
+    TESTING = False
+    SQLALCHEMY_DATABASE_URI = getenv('DATABASE_URL', "NOT_FOUND")
+    SQLALCHEMY_TRACK_MODIFICATIONS = False
+    ENV = 'production'
+    FLASK_APP = 'main.py'
