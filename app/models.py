@@ -1,13 +1,12 @@
 from app import db, ma
 from datetime import datetime
+from marshmallow import fields
 
 
 class BleData(db.Model):
     """
     Data from BLE scanner Model
     """
-
-    # table name
     __tablename__ = 'ble_data'
 
 
@@ -17,9 +16,6 @@ class BleData(db.Model):
     time = db.Column(db.DateTime, default=datetime.now())
     page = db.Column(db.Integer, nullable=False)
 
-
-    # def __init__(self, *args, **kwargs):
-    #     super(BleData, self).__init__(*args, **kwargs)
 
     def __init__(self, mac, level, time, page):
         self.mac = mac
@@ -32,12 +28,23 @@ class BleData(db.Model):
         db.session.add(self)
         db.session.commit()
 
-    # def __repr__(self):
-    #     return '<BLE Data id: {}, mac: {}>'.format(self.id, self.mac)
+    def __repr__(self):
+        return '<BLE Data id: {}, mac: {}>'.format(self.id, self.mac)
 
 
 class BleDataSchema(ma.Schema):
+    """
+    Data from Ble scanner Schema for serializing
+    """
+    id = fields.Int()
+    mac = fields.Str()
+    level = fields.Int()
+    time = fields.DateTime()
+    page = fields.Int()
+    
+
     class Meta:
         model = BleData
-        field = ('id', 'mac', 'level', 'time', 'page')
+        field = ('id', 'mac', 'level', 'time')
+        # exclude = ("page",)
         
