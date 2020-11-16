@@ -17,6 +17,7 @@ pymysql = "*"
 flask-moment = "*"
 flask-restful = "*"
 flask-marshmallow = "*"
+cryptography = "*"
 
 [requires]
 python_version = "3.8"
