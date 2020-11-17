@@ -9,7 +9,7 @@ pipenv run db init
 
 pipenv run db migtare
 
-pipenv run db update
+pipenv run db upgrade
 
 
 export FLASK_ENV=development

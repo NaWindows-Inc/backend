@@ -14,14 +14,12 @@ class BleData(db.Model):
     mac = db.Column(db.String(20), nullable=False)
     level = db.Column(db.Float, nullable=False)
     time = db.Column(db.DateTime, default=datetime.now())
-    page = db.Column(db.Integer, nullable=False)
 
 
-    def __init__(self, mac, level, time, page):
+    def __init__(self, mac, level, time):
         self.mac = mac
         self.level = level
         self.time = time
-        self.page = page
 
 
     def save(self):
@@ -40,11 +38,10 @@ class BleDataSchema(ma.Schema):
     mac = fields.Str()
     level = fields.Int()
     time = fields.DateTime()
-    page = fields.Int()
     
 
     class Meta:
         model = BleData
         field = ('id', 'mac', 'level', 'time')
-        # exclude = ("page",)
+        exclude = ('id',)
         
