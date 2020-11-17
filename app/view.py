@@ -21,11 +21,6 @@ def index():
     return 'Hello world'
 
 
-# check token in black list
-def check_if_token_in_blacklist(token):
-    return token in blacklist
-
-
 # decorator for verifying the JWT 
 def token_required(f): 
     @wraps(f) 
@@ -38,7 +33,7 @@ def token_required(f):
             return jsonify({'error':'Login required', 'response':None}), 401
         try: 
             # decoding the payload to fetch the stored details 
-            if check_if_token_in_blacklist(token):
+            if token in blacklist:
                 raise Exception
             data = jwt.decode(token, app.config['SECRET_KEY']) 
             current_user = User.query.filter_by(public_id = data['public_id']).first() 
@@ -85,8 +80,7 @@ def get_one_page(current_user):
 
 # upload data to db
 @app.route('/api/bledata/upload/', methods=['POST'])
-@token_required
-def add_one_data(current_user):
+def add_one_data():
     try:
         mac = request.json['mac']
         level = int(request.json['level'])
