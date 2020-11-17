@@ -18,6 +18,9 @@ flask-moment = "*"
 flask-restful = "*"
 flask-marshmallow = "*"
 cryptography = "*"
+uuid = "*"
+werkzeug = "*"
+flask-jwt = "*"
 
 [requires]
 python_version = "3.8"
