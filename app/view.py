@@ -152,7 +152,7 @@ def get_all_users(current_user):
 def login(): 
     if request.method == 'POST':
         # creates dictionary of form data 
-        auth = request.form 
+        auth = request.get_json()
     
         if not auth or not auth.get('email') or not auth.get('password'): 
             return jsonify({'error':'Missing email or password', 'response': None}), 401 
@@ -166,7 +166,7 @@ def login():
             # generates the JWT Token 
             token = jwt.encode({'public_id':user.public_id, 'exp':datetime.utcnow()+timedelta(minutes = 30)}, app.config['SECRET_KEY']) 
     
-            return make_response(jsonify({'token' : token.decode('UTF-8')}), 201) 
+            return make_response(jsonify({'token':token.decode('UTF-8'), 'username':user.username, 'email':user.email}), 201) 
         return jsonify({'error':'Wrong password', 'response': None}), 403 
     if request.method == 'GET':
         return jsonify({'error':'use POST request'})
@@ -190,7 +190,7 @@ def logout(current_user):
 @app.route('/signup', methods =['POST','GET']) 
 def signup(): 
     if request.method == 'POST':
-        data = request.form 
+        data = request.get_json()
         username, email, password = data.get('username'), data.get('email'), data.get('password') 
 
         # checking for existing user 
