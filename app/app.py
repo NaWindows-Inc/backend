@@ -20,6 +20,7 @@ manager.add_command('db', MigrateCommand)
 ma = Marshmallow(app)
 CORS(app)
 
+
 @app.before_first_request
 def setup():
     db.create_all()
