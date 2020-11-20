@@ -29,7 +29,6 @@ def doc():
                     '/api/bledata/delete':{'type':'GET','describe':'delete all data','token_req':True}})
 
 
-
 # decorator for verifying the JWT 
 def token_required(f): 
     @wraps(f) 
