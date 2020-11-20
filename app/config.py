@@ -14,7 +14,7 @@ class Development(object):
     SECRET_KEY = getenv("SECRET_KEY", "NOT_FOUND")
     JWT_BLACKLIST_ENABLED1 = True
     ENV = 'development'
-    FLASK_APP = 'main.py'
+    FLASK_APP = 'wsgi.py'
 
 
 class Production(object):
@@ -28,4 +28,4 @@ class Production(object):
     SECRET_KEY = getenv("SECRET_KEY", "NOT_FOUND")
     JWT_BLACKLIST_ENABLED1 = True
     ENV = 'production'
-    FLASK_APP = 'main.py'
+    FLASK_APP = 'wsgi.py'

@@ -1,5 +1,5 @@
 from app import app, db
-from models import BleData, BleDataSchema, User
+from app.models import BleData, BleDataSchema, User
 from flask import request, jsonify, abort, make_response
 from sqlalchemy import func
 import uuid # for public id 

@@ -4,9 +4,8 @@
 **/__pycache__
 
 text.txt
-# Pipfile.lock
 **test.py
 
 **/.env
 
-**/migrations
+migrations

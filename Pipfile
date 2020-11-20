@@ -23,6 +23,7 @@ werkzeug = "*"
 flask-jwt = "*"
 flask-cors = "*"
 gunicorn = "*"
+marshmallow-sqlalchemy = "*"
 
 [requires]
 python_version = "3.8"
