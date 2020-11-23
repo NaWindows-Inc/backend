@@ -1,5 +1,5 @@
 from flask import Flask
-from config import Development, Production
+from app.config import Development, Production
 
 from flask_sqlalchemy import SQLAlchemy
 from flask_migrate import Migrate, MigrateCommand
@@ -19,3 +19,14 @@ manager.add_command('db', MigrateCommand)
 
 ma = Marshmallow(app)
 CORS(app)
+
+
+# Import the application views
+from app import views
+
+# register blueprints
+from .users import users
+app.register_blueprint(users, url_prefix='/user')
+
+from .bledata import bledata
+app.register_blueprint(bledata, url_prefix='/api/bledata')

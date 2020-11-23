@@ -22,10 +22,9 @@ uuid = "*"
 werkzeug = "*"
 flask-jwt = "*"
 flask-cors = "*"
-gunicorn = "*"
 
 [requires]
 python_version = "3.8"
 
 [scripts]
-db = "python app/manage.py db"
+db = "python manage.py db"

@@ -1,6 +1,5 @@
-from app import db, ma
+from app import db
 from datetime import datetime
-from marshmallow import fields
 
 
 class BleData(db.Model):
@@ -22,22 +21,6 @@ class BleData(db.Model):
 
     def __repr__(self):
         return '<BLE Data id: {}, mac: {}>'.format(self.id, self.mac)
-
-
-class BleDataSchema(ma.Schema):
-    """
-    Data from Ble scanner Schema for serializing
-    """
-    id = fields.Int()
-    mac = fields.Str()
-    level = fields.Int()
-    time = fields.DateTime()
-    
-
-    class Meta:
-        model = BleData
-        field = ('id', 'mac', 'level', 'time')
-        exclude = ('id',)
 
 
 class User(db.Model):
