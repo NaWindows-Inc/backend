@@ -1,6 +1,7 @@
 from . import users
 from app import app
-from app.db_operation import create, read, delete
+from app.models import User
+from app.db_operation import create, read, delete, update
 from flask import request, jsonify, abort, make_response
 import uuid # for public id 
 from werkzeug.security import generate_password_hash, check_password_hash 
@@ -63,10 +64,10 @@ def login():
             # generates the JWT Token 
             token = jwt.encode({'public_id':user.public_id, 'exp':datetime.utcnow()+timedelta(minutes = 360)}, app.config['SECRET_KEY']) 
     
-            return make_response(jsonify({'token':token.decode('UTF-8'), 'username':user.username, 'email':user.email}), 201) 
+            return make_response(jsonify({'token':token.decode('UTF-8'), 'username':user.username, 'email':user.email, 'id':user.id}), 201) 
         return jsonify({'error':'Wrong password', 'response': None}), 403 
-    if request.method == 'GET':
-        return jsonify({'error':'Use POST request'})
+    else:
+        return jsonify({'error':'Use POST request', 'response':None})
 
 
 # log user out
@@ -112,8 +113,27 @@ def signup():
                 return jsonify({'error':'User already exists. Please Log in', 'response': None}), 202  
         else:
             return jsonify({'error':'Missing username or email or password', 'response': None}), 403 
-    if request.method == 'GET':
-        return jsonify({'error':'Use POST request'})
+    else:
+        return jsonify({'error':'Use POST request', 'response':None})
+
+
+# update user data
+@users.route('/update', methods=['PUT'])
+@token_required
+def update_data_of_user(current_user):
+    try:
+        data = request.form
+    except:
+        data = request.get_json()
+    for key in data.keys():
+        for value in data.getlist(key):
+            if(key=='password'):
+                value = generate_password_hash(value)
+            if update(field=key, new_value=value, current_user=current_user):
+                return jsonify({'response':'Succesfully updated', 'error':None})
+            else:
+                return jsonify({'error':'Something went wrong', 'response':None})
+    return jsonify({'error': 'Not data for update', 'response': None})
 
 
 # delete user with id
@@ -130,6 +150,6 @@ def delete_user(current_user):
                 logout()
             return jsonify({'response':'Succesfully deleted user', 'error':None})
         else: 
-            return jsonify({'error':'Something went wrong'})
+            return jsonify({'error':'Something went wrong', 'response':None})
     else:
         return jsonify({'error': 'Wrong user id', 'response':None})
