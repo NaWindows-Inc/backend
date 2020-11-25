@@ -1,5 +1,6 @@
-from os import getenv
+import os
 from dotenv import load_dotenv
+basedir = os.path.abspath(os.path.dirname(__file__))
 
 load_dotenv()
 
@@ -8,10 +9,10 @@ class BaseConfig:
     """
     Base environment configurations
     """
-    SQLALCHEMY_DATABASE_URI = getenv("DATABASE_URL", "NOT_FOUND")
+    SQLALCHEMY_DATABASE_URI = os.getenv('DATABASE_URL', 'sqlite:///' + os.path.join(basedir, 'app.db'))
     SQLALCHEMY_TRACK_MODIFICATIONS = False
-    SECRET_KEY = getenv("SECRET_KEY", "NOT_FOUND")
-    JWT_BLACKLIST_ENABLED1 = True
+    SECRET_KEY = os.getenv("SECRET_KEY", "secret_key")
+    JWT_BLACKLIST_ENABLED = True
     FLASK_APP = 'run.py'
 
 

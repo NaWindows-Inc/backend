@@ -43,31 +43,28 @@ def get_users(current_user):
 
 
 # loging user in, return token if susses
-@users.route('/login', methods =['POST','GET']) 
+@users.route('/login', methods =['POST']) 
 def login(): 
-    if request.method == 'POST':
-        # creates dictionary of form data
-        try:
-            auth = request.form
-        except:
-            auth = request.get_json()
+    # creates dictionary of form data
+    try:
+        auth = request.form
+    except:
+        auth = request.get_json()
+
+    if not auth or not auth.get('email') or not auth.get('password'): 
+        return jsonify({'error':'Missing email or password', 'response': None}), 401 
     
-        if not auth or not auth.get('email') or not auth.get('password'): 
-            return jsonify({'error':'Missing email or password', 'response': None}), 401 
-        
-        user = read(email=auth.get('email'), user=True) 
-    
-        if not user: 
-            return jsonify({'error':'User does not exist', 'response': None}), 401  
-    
-        if check_password_hash(user.password, auth.get('password')): 
-            # generates the JWT Token 
-            token = jwt.encode({'public_id':user.public_id, 'exp':datetime.utcnow()+timedelta(minutes = 360)}, app.config['SECRET_KEY']) 
-    
-            return make_response(jsonify({'token':token.decode('UTF-8'), 'username':user.username, 'email':user.email, 'id':user.id}), 201) 
-        return jsonify({'error':'Wrong password', 'response': None}), 403 
-    else:
-        return jsonify({'error':'Use POST request', 'response':None})
+    user = read(email=auth.get('email'), user=True) 
+
+    if not user: 
+        return jsonify({'error':'User does not exist', 'response': None}), 401  
+
+    if check_password_hash(user.password, auth.get('password')): 
+        # generates the JWT Token 
+        token = jwt.encode({'public_id':user.public_id, 'exp':datetime.utcnow()+timedelta(minutes = 360)}, app.config['SECRET_KEY']) 
+
+        return make_response(jsonify({'token':token.decode('UTF-8'), 'username':user.username, 'email':user.email, 'id':user.id}), 201) 
+    return jsonify({'error':'Wrong password', 'response': None}), 403 
 
 
 # log user out
@@ -85,36 +82,33 @@ def logout(current_user):
 
 
 # registration new user  
-@users.route('/signup', methods =['POST','GET']) 
+@users.route('/signup', methods =['POST']) 
 def signup(): 
-    if request.method == 'POST':
-        try:
-            data = request.form
-        except:
-            data = request.get_json()
-        username, email, password = data.get('username'), data.get('email'), data.get('password') 
+    try:
+        data = request.form
+    except:
+        data = request.get_json()
+    username, email, password = data.get('username'), data.get('email'), data.get('password') 
 
-        # checking for existing user 
-        user = read(email=data.get('email'), user=True)
-        if username and email and password:
-            if not user: 
-                # database ORM object 
-                user = User( 
-                    public_id = str(uuid.uuid4()), 
-                    username = username, 
-                    email = email, 
-                    password = generate_password_hash(password) 
-                ) 
-                # insert user 
-                create(new_user=user)
-        
-                return jsonify({'response':'Successfully registered','error': None}), 201  
-            else: 
-                return jsonify({'error':'User already exists. Please Log in', 'response': None}), 202  
-        else:
-            return jsonify({'error':'Missing username or email or password', 'response': None}), 403 
+    # checking for existing user 
+    user = read(email=data.get('email'), user=True)
+    if username and email and password:
+        if not user: 
+            # database ORM object 
+            user = User( 
+                public_id = str(uuid.uuid4()), 
+                username = username, 
+                email = email, 
+                password = generate_password_hash(password) 
+            ) 
+            # insert user 
+            create(new_user=user)
+    
+            return jsonify({'response':'Successfully registered','error': None}), 201  
+        else: 
+            return jsonify({'error':'User already exists. Please Log in', 'response': None}), 202  
     else:
-        return jsonify({'error':'Use POST request', 'response':None})
+        return jsonify({'error':'Missing username or email or password', 'response': None}), 403 
 
 
 # update user data

@@ -95,7 +95,32 @@ def doc():
                         'token_req':True}})
 
 
-# page not found
+# error handlers
 @app.errorhandler(404)
 def not_found(error):
+    """
+    Return a custom 404 Http response message for missing or not found routes.
+    :param e: Exception
+    :return: Http Response
+    """
     return make_response(jsonify({'error':'not found page'}), 404)
+
+
+@app.errorhandler(405)
+def method_not_found(e):
+    """
+    Custom response for methods not allowed for the requested URLs
+    :param e: Exception
+    :return:
+    """
+    return make_response(jsonify({'error':'The method is not allowed for the requested URL'}), 405)
+
+
+@app.errorhandler(500)
+def internal_server_error(e):
+    """
+    Return a custom message for a 500 internal error
+    :param e: Exception
+    :return:
+    """
+    return make_response(jsonify({'error':'Internal server error'}), 500)

@@ -45,23 +45,20 @@ def get_one_page(current_user):
 
 
 # upload data to db
-@bledata.route('/upload', methods=['POST','GET'])
+@bledata.route('/upload', methods=['POST'])
 def add_one_data():
     print(str(request.json['mac'])+ '  '+str(request.json['level'])+'  '+str(request.json['time']))
-    if request.method == 'POST':
-        try:
-            mac = request.json['mac']
-            level = int(request.json['level'])
-            time = request.json['time']
+    try:
+        mac = request.json['mac']
+        level = int(request.json['level'])
+        time = request.json['time']
 
-            new_data = BleData(mac, level, time)
-            create(new_data=new_data)
+        new_data = BleData(mac, level, time)
+        create(new_data=new_data)
 
-            return bleDataSchemaOne.jsonify(new_data)
-        except Exception:
-            return jsonify({'error':'Wrong data format'})
-    if request.method == 'GET':
-        return jsonify({'error':'use POST request'})
+        return bleDataSchemaOne.jsonify(new_data)
+    except Exception:
+        return jsonify({'error':'Wrong data format'})
 
 
 # delete all data from db
