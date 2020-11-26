@@ -49,7 +49,7 @@
 ## Run tests
 - run tests without coverage:
   ```
-  pipenv run manage.py test
+  pipenv run test
   ```
 - run test with coverage:
   ```

@@ -61,9 +61,15 @@ def login():
 
     if check_password_hash(user.password, auth.get('password')): 
         # generates the JWT Token 
-        token = jwt.encode({'public_id':user.public_id, 'exp':datetime.utcnow()+timedelta(minutes = 360)}, app.config['SECRET_KEY']) 
+        token = jwt.encode({'public_id':user.public_id, 
+                            'exp':datetime.utcnow()+timedelta(minutes = 360)}, 
+                            app.config['SECRET_KEY']) 
 
-        return make_response(jsonify({'token':token.decode('UTF-8'), 'username':user.username, 'email':user.email, 'id':user.id}), 201) 
+        return make_response(jsonify({'response':{'token':token.decode('UTF-8'), 
+                                                'username':user.username, 
+                                                'email':user.email, 
+                                                'id':user.id}, 
+                                    'error': None}), 201) 
     return jsonify({'error':'Wrong password', 'response': None}), 403 
 
 
@@ -75,8 +81,6 @@ def logout(current_user):
     # jwt is passed in the request header 
     if 'x-access-token' in request.headers: 
         token = request.headers['x-access-token']  
-    if not token: 
-        return jsonify({'error':'Login required', 'response':None}), 401
     blacklist.add(token)
     return jsonify({'response': 'Successfully logged out', 'error': None}), 200
 

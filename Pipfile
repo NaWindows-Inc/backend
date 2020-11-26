@@ -31,3 +31,4 @@ python_version = "3.8"
 
 [scripts]
 db = "python manage.py db"
+test = "python manage.py test"
