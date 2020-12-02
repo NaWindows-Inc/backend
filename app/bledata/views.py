@@ -5,13 +5,16 @@ from app.schemes import BleDataSchema
 from flask import request, jsonify
 from app.views import token_required
 from app.db_operation import create, read, delete
+import re
 
 
 bleDataSchemaAll = BleDataSchema(many=True)
 bleDataSchemaOne = BleDataSchema()
 
 
-# get data /api/bledata/ - all data, /api/bledata/?count=NUM&page=NUM - get with pagination
+# get data /api/bledata/ - all data, 
+# /api/bledata/?count=NUM&page=NUM - get with pagination
+# /api/bledata/ with 'mac' in body - get all data by mac
 @bledata.route('/', methods=['GET'])
 @token_required
 def get_one_page(current_user):
@@ -37,28 +40,77 @@ def get_one_page(current_user):
         else:
             return jsonify({'error':'Wrong page or count'})
     else:
-        all_data = read(all_data=True)
-        all_data_dump = bleDataSchemaAll.dump(all_data)
-        totalCount = read()
-        result = {'items':all_data_dump, 'totalCount':totalCount, 'error': error}
-        return jsonify(result)
+        try:
+            data_mac = request.form
+        except:
+            data_mac = request.get_json()
+        if data_mac.get('mac'):
+            all_data_mac = bleDataSchemaAll.dump(read(mac=data_mac.get('mac')))
+            result = []
+            for mac in all_data_mac:
+                result.append({
+                    'level': mac['level'],
+                    'time': mac['time'],
+                })
+            return jsonify({'items': result, 'error': None, 'totalCount': len(all_data_mac)}) 
+        else:
+            all_data = read(all_data=True)
+            all_data_dump = bleDataSchemaAll.dump(all_data)
+            totalCount = read()
+            result = {'items':all_data_dump, 'totalCount':totalCount, 'error': error}
+            return jsonify(result)
 
 
 # upload data to db
 @bledata.route('/upload', methods=['POST'])
 def add_one_data():
-    print(str(request.json['mac'])+ '  '+str(request.json['level'])+'  '+str(request.json['time']))
     try:
-        mac = request.json['mac']
-        level = int(request.json['level'])
-        time = request.json['time']
+        data = request.form
+    except:
+        try:
+            data = request.get_json()
+        except:
+            data = ''
+            print("Upload without header")
+    if data: 
+        try:
+            mac, level, time = data.get('mac'), int(data.get('level')), data.get('time') 
+        except Exception:
+            return jsonify({'error':'Wrong data format'}), 403 
+
+        try:
+            response = upload_to_db(mac=mac, level=level, time=time)
+        except:
+            response = -2
+
+        if response != -1 and response != -2 :
+            return response
+        elif response == -2:
+            return jsonify({'error':'Wrong time format'}), 403
+        else:
+            return jsonify({'error':'Wrong mac format'}), 403
+    else:
+        try:
+            mac, time, level = request.json['mac'], request.json['time'], int(request.json['level'])
+
+            response = upload_to_db(mac=mac, level=level, time=time)
+            if response != -1:
+                return response
+            else:
+                return jsonify({'error':'Wrong mac format'}), 403 
+        except Exception:
+            return jsonify({'error':'Wrong data format'}), 403 
+
+def upload_to_db(mac, level, time=''):
+    if re.match("[0-9a-f]{2}([-:]?)[0-9a-f]{2}(\\1[0-9a-f]{2}){4}$", mac.lower()):
+        print(str(mac)+ '  '+str(level)+'  '+str(time))
 
         new_data = BleData(mac, level, time)
-        create(new_data=new_data)
+        response = create(new_data=new_data)
 
         return bleDataSchemaOne.jsonify(new_data)
-    except Exception:
-        return jsonify({'error':'Wrong data format'})
+    else:
+        return -1
 
 
 # delete all data from db
@@ -69,4 +121,4 @@ def delete_all_data(current_user):
     if num_rows_deleted:
         return jsonify({'deleted':num_rows_deleted, 'error': None})
     else:
-        return jsonify({'error':'Nothing deleted'})
+        return jsonify({'error':'Nothing deleted'}), 401

@@ -25,6 +25,8 @@ flask-cors = "*"
 pytest = "*"
 coverage = "*"
 flask-testing = "*"
+gunicorn = "*"
+marshmallow-sqlalchemy = "*"
 
 [requires]
 python_version = "3.8"

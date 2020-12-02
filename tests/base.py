@@ -58,3 +58,12 @@ class BaseTestCase(TestCase):
         data = json.loads(response.data.decode())
         data = data['response']
         return data['token']
+    
+    def upload_data(self, mac='', level='', time=''):
+        """
+        Upload data
+        :return:
+        """
+        return self.client.post(
+            '/api/bledata/upload',
+            data={'mac':mac, 'level':level, 'time': time})

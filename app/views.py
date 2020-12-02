@@ -60,7 +60,7 @@ def doc():
                         {'type':'POST',
                         'describe':'login', 
                         'token_req':True, 
-                        'response':'token'},
+                        'response': 'token, username, email, id'},
                     '/user/logout':
                         {'type':'DELETE',
                         'describe':'logout',
@@ -85,6 +85,10 @@ def doc():
                         {'type':'GET',
                         'describe':'data with pagination',
                         'token_req':True},
+                    '/api/bledata/ body: mac':
+                        {'type':'GET',
+                        'describe':'all data by mac',
+                        'token_req':True}, 
                     '/api/bledata/upload':
                         {'type':'POST',
                         'describe':'upload data to db',

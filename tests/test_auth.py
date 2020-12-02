@@ -262,5 +262,188 @@ class TestUserBluePrint(BaseTestCase):
             self.assertTrue(response.content_type == 'application/json')
             self.assertEqual(response.status_code, 200)
 
+    def test_get_user_by_wrong_id(self):
+        """
+        Test getting user by wrong id 
+        :return:
+        """
+        self.register_user(username='test', email='test@test.com', password='test123')
+        response = self.login_user(email='test@test.com', password='test123')
+        data = json.loads(response.data.decode())
+        data = data['response']
+        token = data['token']
+        url = '/user/'+'?id=111'+str(data['id'])
 
-#TODO test for error 404, 405, 500, update, delete, check_token, bledata views
+        with self.client:
+            response = self.client.get(
+                url,
+                headers={'x-access-token':token})
+            data = json.loads(response.data.decode())
+            self.assertTrue(data['error'] == 'Wrong id')
+            self.assertTrue(response.content_type == 'application/json')
+            self.assertEqual(response.status_code, 403)
+
+    def test_user_update_password(self):
+        """
+        Test update password of user
+        :return:
+        """
+        token = self.get_user_token()
+        
+        with self.client:
+            response = self.client.put(
+                "/user/update",
+                data={'password':'new_password'},
+                headers={'x-access-token':token})
+            data = json.loads(response.data.decode())
+            self.assertTrue(data['error'] is None)
+            self.assertTrue(data['response'] == 'Succesfully updated')
+            self.assertTrue(response.content_type == 'application/json')
+            self.assertEqual(response.status_code, 200)
+
+    def test_user_update_username(self):
+        """
+        Test update username of user
+        :return:
+        """
+        token = self.get_user_token()
+        
+        with self.client:
+            response = self.client.put(
+                "/user/update",
+                data={'username':'new_username'},
+                headers={'x-access-token':token})
+            data = json.loads(response.data.decode())
+            self.assertTrue(data['error'] is None)
+            self.assertTrue(data['response'] == 'Succesfully updated')
+            self.assertTrue(response.content_type == 'application/json')
+            self.assertEqual(response.status_code, 200)
+    
+    def test_user_update_email(self):
+        """
+        Test update email of user
+        :return:
+        """
+        token = self.get_user_token()
+        
+        with self.client:
+            response = self.client.put(
+                "/user/update",
+                data={'email':'new_email@gmail.com'},
+                headers={'x-access-token':token})
+            data = json.loads(response.data.decode())
+            self.assertTrue(data['error'] is None)
+            self.assertTrue(data['response'] == 'Succesfully updated')
+            self.assertTrue(response.content_type == 'application/json')
+            self.assertEqual(response.status_code, 200)
+
+    def test_user_update_email_and_password(self):
+        """
+        Test update email and password of user
+        :return:
+        """
+        token = self.get_user_token()
+        
+        with self.client:
+            response = self.client.put(
+                "/user/update",
+                data={'email':'new_email@gmail.com', "password":'new_password'},
+                headers={'x-access-token':token})
+            data = json.loads(response.data.decode())
+            self.assertTrue(data['error'] is None)
+            self.assertTrue(data['response'] == 'Succesfully updated')
+            self.assertTrue(response.content_type == 'application/json')
+            self.assertEqual(response.status_code, 200)
+
+    def test_user_update_with_wrong_parameter(self):
+        """
+        Test update with wrong parameter of user
+        :return:
+        """
+        token = self.get_user_token()
+        
+        with self.client:
+            response = self.client.put(
+                "/user/update",
+                data={'something':'new_email@gmail.com'},
+                headers={'x-access-token':token})
+            data = json.loads(response.data.decode())
+            self.assertTrue(data['response'] is None)
+            self.assertTrue(data['error'] == 'Something went wrong')
+            self.assertTrue(response.content_type == 'application/json')
+            self.assertEqual(response.status_code, 403)
+
+    def test_user_update_with_missed_parameter(self):
+        """
+        Test update with missed parameter of user
+        :return:
+        """
+        token = self.get_user_token()
+        
+        with self.client:
+            response = self.client.put(
+                "/user/update",
+                headers={'x-access-token':token})
+            data = json.loads(response.data.decode())
+            self.assertTrue(data['response'] is None)
+            self.assertTrue(data['error'] == 'Not data for update')
+            self.assertTrue(response.content_type == 'application/json')
+            self.assertEqual(response.status_code, 401)
+
+    def test_user_delete_by_id(self):
+        """
+        Test delete the user by id
+        :return:
+        """
+        self.register_user(username='test', email='test@test.com', password='test123')
+        response = self.login_user(email='test@test.com', password='test123')
+        data = json.loads(response.data.decode())
+        data = data['response']
+        url = '/user/delete'+'?id='+str(data['id'])
+        token = self.get_user_token()
+
+        with self.client:
+            response = self.client.delete(
+                url,
+                headers={'x-access-token':token})
+            data = json.loads(response.data.decode())
+            self.assertTrue(data['response'] == 'Succesfully deleted user')
+            self.assertTrue(data['error'] is None)
+            self.assertTrue(response.content_type == 'application/json')
+            self.assertEqual(response.status_code, 200)
+
+    def test_user_delete_with_missed_id(self):
+        """
+        Test delete the user with missed id
+        :return:
+        """
+        token = self.get_user_token()
+        self.register_user(username='test', email='test@test.com', password='test123')
+
+        with self.client:
+            response = self.client.delete(
+                '/user/delete',
+                headers={'x-access-token':token})
+            data = json.loads(response.data.decode())
+            self.assertTrue(data['error'] == 'Wrong user id')
+            self.assertTrue(data['response'] is None)
+            self.assertTrue(response.content_type == 'application/json')
+            self.assertEqual(response.status_code, 401)
+
+    def test_user_delete_with_wrong_id(self):
+        """
+        Test delete the user with wrong id
+        :return:
+        """
+        token = self.get_user_token()
+        self.register_user(username='test', email='test@test.com', password='test123')
+
+        with self.client:
+            response = self.client.delete(
+                '/user/delete?id=1000',
+                headers={'x-access-token':token})
+            data = json.loads(response.data.decode())
+            self.assertTrue(data['error'] == 'Something went wrong')
+            self.assertTrue(data['response'] is None)
+            self.assertTrue(response.content_type == 'application/json')
+            self.assertEqual(response.status_code, 403)

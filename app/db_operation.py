@@ -1,6 +1,5 @@
 from app import db
 from app.models import BleData
-from app.schemes import BleDataSchema
 from sqlalchemy import func
 from app.models import User
 
@@ -12,12 +11,14 @@ def create(new_data=None,new_user=None):
     # new user
     else:
         add_data=new_user
+    try:
+        db.session.add(add_data)
+        db.session.commit()
+        return 'Successfully upload'    
+    except:
+        return 'Something went wrong'
 
-    db.session.add(add_data)
-    db.session.commit()    
-    
-
-def read(id=None, email=None, public_id=None, user=False, all_data=False, page=None, count=None):
+def read(id=None, email=None, public_id=None, user=False, all_data=False, mac=None, page=None, count=None):
     if user:
         if id:
             # get user by id
@@ -38,6 +39,9 @@ def read(id=None, email=None, public_id=None, user=False, all_data=False, page=N
         elif page and count:
             # get data with pagination
             return BleData.query.order_by(BleData.id.desc()).paginate(page,count,error_out=False)
+        elif mac:
+            # get data by mac
+            return BleData.query.filter_by(mac=mac).all()
         else:
             # get number of records data
             return db.session.query(func.count(BleData.id)).scalar()

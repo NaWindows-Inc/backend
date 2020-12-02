@@ -39,7 +39,7 @@ def get_users(current_user):
                             'id':user.id ,
                             'error':None})
         else:
-            return jsonify({'error': 'Wrong username'})
+            return jsonify({'error': 'Wrong id'}), 403
 
 
 # loging user in, return token if susses
@@ -130,8 +130,8 @@ def update_data_of_user(current_user):
             if update(field=key, new_value=value, current_user=current_user):
                 return jsonify({'response':'Succesfully updated', 'error':None})
             else:
-                return jsonify({'error':'Something went wrong', 'response':None})
-    return jsonify({'error': 'Not data for update', 'response': None})
+                return jsonify({'error':'Something went wrong', 'response':None}), 403
+    return jsonify({'error': 'Not data for update', 'response': None}), 401
 
 
 # delete user with id
@@ -148,6 +148,6 @@ def delete_user(current_user):
                 logout()
             return jsonify({'response':'Succesfully deleted user', 'error':None})
         else: 
-            return jsonify({'error':'Something went wrong', 'response':None})
+            return jsonify({'error':'Something went wrong', 'response':None}), 403
     else:
-        return jsonify({'error': 'Wrong user id', 'response':None})
+        return jsonify({'error': 'Wrong user id', 'response':None}), 401
