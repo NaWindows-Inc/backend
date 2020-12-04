@@ -1,0 +1,612 @@
+swagger: "2.0"
+info:
+  description: "This is the documentation for backend of BleData scanner. Official documentation of Swagger at [http://swagger.io](http://swagger.io)."
+  version: "1.0.0"
+  title: "Backend BLE Scanner"
+  contact:
+    email: "vvrublevsyi@gmail.com"
+
+tags:
+- name: "Bledata"
+  description: "Operations with Bledata"
+- name: "User"
+  description: "Operations about user"
+- name: "Common"
+  description: "Common operation in backend"
+schemes:
+- "https"
+- "http"
+
+paths:
+  /hello:
+    get:
+      tags:
+      - "Common"
+      summary: "Check valid token"
+      consumes:
+      - "application/json"
+      produces:
+      - "application/json"
+      parameters:
+      - name: "token"
+        description: "To receive a token you need to login (/user/login)"
+        in: "header"
+        required: false
+        type: "string"
+      responses:
+        "200":
+          description: OK
+          schema:
+            type: "array"
+            items:
+              $ref: '#/definitions/TokenCheck'
+        "401":
+          description: "Login required"
+        "403":
+          description: "Invalid token"
+      security:
+      - user_auth:
+        - "read:data"
+  
+  
+  /api/bledata/:
+    get:
+      tags:
+      - "Bledata"
+      summary: "Get all data from ble scanner"
+      consumes:
+      - "application/json"
+      produces:
+      - "application/json"
+      parameters:
+      - name: "token"
+        description: "To receive a token you need to login (/user/login)"
+        in: "header"
+        required: false
+        type: "string"
+      responses:
+        "200":
+          description: OK
+          schema:
+            type: "array"
+            items:
+              $ref: '#/definitions/BledataResponse'
+        "401":
+          description: "Login required"
+        "403":
+          description: "Invalid token"
+      security:
+      - user_auth:
+        - "read:data"
+            
+    post:
+      tags:
+      - "Bledata"
+      summary: "Get all data by mac"
+      operationId: "getById"
+      consumes:
+      - "application/json"
+      produces:
+      - "application/json"
+      parameters:
+      - name: "token"
+        description: "To receive a token you need to login (/user/login)"
+        in: "header"
+        required: false
+        type: "string"
+      - in: "body"
+        name: "body"
+        description: "Get all data by MAC address "
+        required: true
+        schema:
+          $ref: "#/definitions/MacBle"
+          
+      responses:
+        "200":
+          description: OK
+          schema:
+            type: "array"
+            items:
+              $ref: '#/definitions/BledataResponse'
+        "401":
+          description: "Login required"
+        "402":
+          description: "Invalid token"
+        "403":
+          description: "Please, send mac address"
+      security:
+      - user_auth:
+        - "read:data"
+
+  /api/bledata/{page}{count}:
+    get:
+      tags:
+      - "Bledata"
+      summary: "Get all data with pagination "
+      description: "Example request: IP_ADDRESS/api/bledata/?page=1&count=10"
+      consumes:
+      - "application/json"
+      produces:
+      - "application/json"
+      parameters:
+      - name: "token"
+        description: "To receive a token you need to login (/user/login)"
+        in: "header"
+        required: false
+        type: "string"
+      - name: "page"
+        in: "path"
+        description: "Count of page to return"
+        required: true
+        type: "integer"
+        format: "int64"
+      - name: "count"
+        in: "path"
+        description: "Count of data in the page to return"
+        required: true
+        type: "integer"
+        format: "int64"
+        
+      responses:
+        "200":
+          description: OK
+          schema:
+            type: "array"
+            items:
+              $ref: '#/definitions/BledataResponse'
+        "401":
+          description: "Login required"
+        "402":
+          description: "Invalid token"
+        "403":
+          description: "Wrong page or count"
+      security:
+      - user_auth:
+        - "read:data"
+
+  /api/bledata/upload:
+    post:
+      tags:
+      - "Bledata"
+      summary: "Upload data to database"
+      operationId: "uploadByData"
+      consumes:
+      - "application/json"
+      produces:
+      - "application/json"
+      parameters:
+      - in: "body"
+        name: "body"
+        description: "Get all data by MAC address "
+        required: true
+        schema:
+          $ref: "#/definitions/BleUpload"
+      responses:
+        "200":
+          description: OK
+          schema:
+            type: "array"
+            items:
+              $ref: '#/definitions/BleUpload'
+        "403":
+          description: "Wrong data format"
+
+  /api/bledata/delete:
+    delete:
+      tags:
+      - "Bledata"
+      summary: "Delete all data from database"
+      operationId: "deleteData"
+      consumes:
+      - "application/json"
+      produces:
+      - "application/json"
+      parameters:
+      - name: "token"
+        description: "To receive a token you need to login (/user/login)"
+        in: "header"
+        required: false
+        type: "string"
+
+      responses:
+        "200":
+          description: OK
+          schema:
+            type: "array"
+            items:
+              $ref: '#/definitions/DeleteData'
+        "401":
+          description: "Login required"
+        "402":
+          description: "Invalid token"
+      security:
+      - user_auth:
+        - "read:data"
+
+
+  /user/:
+    get:
+      tags:
+      - "User"
+      summary: "Get all users"
+      consumes:
+      - "application/json"
+      produces:
+      - "application/json"
+      parameters:
+      - name: "token"
+        description: "To receive a token you need to login (/user/login)"
+        in: "header"
+        required: false
+        type: "string"
+
+      responses:
+        "200":
+          description: OK
+          schema:
+            type: "array"
+            items:
+              $ref: '#/definitions/UserData'
+        "401":
+          description: "Login required"
+        "402":
+          description: "Invalid token"
+      security:
+      - user_auth:
+        - "read:data"    
+  
+  /user/{id}:
+    get:
+      tags:
+      - "User"
+      summary: "Get all users by id"
+      consumes:
+      - "application/json"
+      produces:
+      - "application/json"
+      parameters:
+      - name: "token"
+        description: "To receive a token you need to login (/user/login)"
+        in: "header"
+        required: false
+        type: "string"
+      - name: "id"
+        in: "path"
+        description: "ID of user"
+        required: true
+        type: "integer"
+        format: "int64"
+      responses:
+        "200":
+          description: OK
+          schema:
+            type: "array"
+            items:
+              $ref: '#/definitions/OneUser'
+        "401":
+          description: "Login required"
+        "402":
+          description: "Invalid token"
+      security:
+      - user_auth:
+        - "read:data"    
+
+  /user/login:
+    post:
+      tags:
+      - "User"
+      summary: "Login with registration parameters"
+      operationId: "loginUser"
+      consumes:
+      - "application/json"
+      produces:
+      - "application/json"
+      parameters:
+      - in: "body"
+        name: "body"
+        description: "Parameters for login"
+        required: true
+        schema:
+          $ref: "#/definitions/UserLogin"
+      responses:
+        "201":
+          description: OK
+          schema:
+            type: "array"
+            items:
+              $ref: '#/definitions/LoginResponse'
+        "401":
+          description: "Missing email or password or User does not exist"
+        "403":
+          description: "Wrong password"
+
+
+  /user/signup:
+    post:
+      tags:
+      - "User"
+      summary: "Sign up new user"
+      operationId: "signupUser"
+      consumes:
+      - "application/json"
+      produces:
+      - "application/json"
+      parameters:
+      - in: "body"
+        name: "body"
+        description: "Parameters for signup"
+        required: true
+        schema:
+          $ref: "#/definitions/UserSignup"
+      responses:
+        "201":
+          description: "Successfully registered"
+        "202":
+          description: "User already exists. Please Log in"
+        "403":
+          description: "Missing username or email or password"
+
+
+  /user/logout:
+    delete:
+      tags:
+      - "User"
+      summary: "Log out user"
+      operationId: "logoutUser"
+      consumes:
+      - "application/json"
+      produces:
+      - "application/json"
+      parameters:
+      - name: "token"
+        description: "To receive a token you need to login (/user/login)"
+        in: "header"
+        required: false
+        type: "string"
+      responses:
+        "200":
+          description: "Successfully logged out"
+        "401":
+          description: "Login required"
+        "402":
+          description: "Invalid token"
+      security:
+      - user_auth:
+        - "read:data" 
+
+  /user/update:
+    put:
+      tags:
+      - "User"
+      summary: "Update user data"
+      operationId: "updateUser"
+      consumes:
+      - "application/json"
+      produces:
+      - "application/json"
+      parameters:
+      - name: "token"
+        description: "To receive a token you need to login (/user/login)"
+        in: "header"
+        required: false
+        type: "string"
+      - in: "body"
+        name: "username"
+        description: "Parameter for updtae username"
+        required: true
+        schema:
+          $ref: "#/definitions/UpdateUser"
+      responses:
+        "200":
+          description: "Succesfully updated"
+        "401":
+          description: "Login required or Not data for update" 
+        "402":
+          description: "Invalid token"
+        "404":
+          description: "Something went wrong"
+      security:
+      - user_auth:
+        - "read:data" 
+
+  /user/delete{id}:
+    delete:
+      tags:
+      - "User"
+      summary: "Delete user by ID"
+      consumes:
+      - "application/json"
+      produces:
+      - "application/json"
+      parameters:
+      - name: "token"
+        description: "To receive a token you need to login (/user/login)"
+        in: "header"
+        required: false
+        type: "string"
+      - name: "id"
+        in: "path"
+        description: "ID of user"
+        required: true
+        type: "integer"
+        format: "int64"
+        
+      responses:
+        "200":
+          description: "Succesfully deleted user"
+        "401":
+          description: "Login required or Wrong user id" 
+        "402":
+          description: "Invalid token"
+        "404":
+          description: "Something went wrong"
+        
+      security:
+      - user_auth:
+        - "read:data" 
+
+securityDefinitions:
+  user_auth:
+    type: "oauth2"
+    authorizationUrl: https://IP_ADDRESS/user/login
+    flow: "implicit"
+    scopes:
+      read:data: "read some data"
+
+
+ 
+definitions:
+  UserData:
+    type: "object"
+    properties:
+      error:
+        type: "string"
+      users:
+        $ref: "#/definitions/OneUser"
+    xml:
+      name: "UserData"
+      
+  UpdateUser:
+    type: "object"
+    properties:
+      username:
+        type: "string"
+      password:
+        type: "string"
+      email:
+        type: "string"
+    xml:
+      name: "UpdateUsername" 
+  
+  UserLogin:
+    type: "object"
+    properties:
+      email:
+        type: "string"
+      password:
+        type: "string"
+    xml:
+      name: "UserLogin"
+  
+  UserSignup:
+    type: "object"
+    properties:
+      username:
+        type: "string"    
+      email:
+        type: "string"
+      password:
+        type: "string"
+    xml:
+      name: "UserSignup" 
+  
+  LoginResponse:
+    type: "object"
+    properties:
+      response:
+        $ref: "#/definitions/LoginResponseDesc"  
+      error:
+        type: "string"
+    xml:
+      name: "LoginResponse"  
+  
+  LoginResponseDesc:
+    type: "object"
+    properties:
+      token:
+        type: "string"
+      username:
+        type: "string"
+      email:
+        type: "string"
+      id:
+        type: "integer"
+        format: "int64"
+    xml:
+      name: "LoginResponseDesc"     
+  
+  OneUser:
+    type: "object"
+    properties:
+      email:
+        type: "string"
+      id:
+        type: "integer"
+        format: "int64"
+      public_id:
+        type: "string"
+      username:
+        type: "string"
+    xml:
+      name: "OneUser"    
+    
+  MacBle:
+    type: "object"
+    properties:
+      mac:
+        type: "string"
+        format: "Mac address"
+    xml:
+      name: "MacBle"
+
+  BleUpload:
+    type: "object"
+    properties:
+      mac:
+        type: "string"
+        format: "Mac address"
+      level:
+        type: "integer"
+        format: "int64"
+      time:
+        type: "string"
+        format: "date-time"
+    xml:
+      name: "BleUpload"
+      
+  BledataResponse:
+    type: "object"
+    properties:
+      error:
+        type: "string"
+      totalCount:
+        type: "integer"
+        format: "int64"
+      items:
+        $ref: "#/definitions/ItemsDesc"
+    xml:
+      name: "BledataResponse"
+  
+  ItemsDesc:
+    type: "object"
+    properties:
+      level:
+        type: "integer"
+        format: "int64"
+      mac:
+        type: "string"
+        format: "Mac address"
+      time:
+        type: "string"
+        format: "date-time"
+    xml:
+      name: "ItemsDesc"
+      
+  DeleteData:
+    type: "object"
+    properties:
+      deleted:
+        type: "integer"
+        format: "int64"
+      error:
+        type: "string"
+        
+  TokenCheck:
+    type: "object"
+    properties:
+      valid:
+        type: "boolean"
+      remaining:
+        description: "Remaining time in minutes"
+        type: "integer"
+        format: "int64"

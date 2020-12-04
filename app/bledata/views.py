@@ -15,31 +15,38 @@ bleDataSchemaOne = BleDataSchema()
 # get data /api/bledata/ - all data, 
 # /api/bledata/?count=NUM&page=NUM - get with pagination
 # /api/bledata/ with 'mac' in body - get all data by mac
-@bledata.route('/', methods=['GET'])
+@bledata.route('/', methods=['GET', 'POST'])
 @token_required
 def get_one_page(current_user):
     error = None
-    try:
-        num_page = int(request.args['page'])
-        count_data = int(request.args['count'])
-    except:
-        num_page = 0
-        count_data = 0
-
-    if num_page and count_data:
+    if request.method == 'GET':
         try:
-            data_page = read(count=count_data, page=num_page)
-            data_page_dump = bleDataSchemaAll.dump(data_page.items)
-        except Exception as er:
-            error = er
+            num_page = int(request.args['page'])
+            count_data = int(request.args['count'])
+        except:
+            num_page = 0
+            count_data = 0
 
-        if data_page_dump:
-            totalCount = read()
-            result = {'items':data_page_dump, 'totalCount':totalCount, 'error': error}
-            return jsonify(result)
+        if num_page and count_data:
+            try:
+                data_page = read(count=count_data, page=num_page)
+                data_page_dump = bleDataSchemaAll.dump(data_page.items)
+            except Exception as er:
+                error = er
+
+            if data_page_dump:
+                totalCount = read()
+                result = {'items':data_page_dump, 'totalCount':totalCount, 'error': error}
+                return jsonify(result)
+            else:
+                return jsonify({'error':'Wrong page or count'}), 403
         else:
-            return jsonify({'error':'Wrong page or count'})
-    else:
+            all_data = read(all_data=True)
+            all_data_dump = bleDataSchemaAll.dump(all_data)
+            totalCount = read()
+            result = {'items':all_data_dump, 'totalCount':totalCount, 'error': error}
+            return jsonify(result)
+    elif request.method == 'POST':
         try:
             data_mac = request.form
         except:
@@ -54,11 +61,8 @@ def get_one_page(current_user):
                 })
             return jsonify({'items': result, 'error': None, 'totalCount': len(all_data_mac)}) 
         else:
-            all_data = read(all_data=True)
-            all_data_dump = bleDataSchemaAll.dump(all_data)
-            totalCount = read()
-            result = {'items':all_data_dump, 'totalCount':totalCount, 'error': error}
-            return jsonify(result)
+            return jsonify({'error': 'Please, send mac address'}), 403
+            
 
 
 # upload data to db

@@ -213,7 +213,7 @@ class TestUserBluePrint(BaseTestCase):
             self.assertTrue(data['error'] == 'Invalid token')
             self.assertTrue(data['remaining'] is None)
             self.assertTrue(response.content_type == 'application/json')
-            self.assertEqual(response.status_code, 401)
+            self.assertEqual(response.status_code, 402)
     
     def test_get_all_users(self):
         """

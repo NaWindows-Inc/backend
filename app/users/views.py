@@ -128,7 +128,7 @@ def update_data_of_user(current_user):
             if(key=='password'):
                 value = generate_password_hash(value)
             if update(field=key, new_value=value, current_user=current_user):
-                return jsonify({'response':'Succesfully updated', 'error':None})
+                return jsonify({'response':'Succesfully updated', 'error':None}), 200
             else:
                 return jsonify({'error':'Something went wrong', 'response':None}), 403
     return jsonify({'error': 'Not data for update', 'response': None}), 401
