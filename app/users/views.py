@@ -47,13 +47,12 @@ def get_users(current_user):
 def login(): 
     # creates dictionary of form data
     try:
-        auth = request.form
-    except:
         auth = request.get_json()
+        if not auth or not auth.get('email') or not auth.get('password'): 
+            return jsonify({'error':'Missing email or password', 'response': None}), 401 
+    except:
+        return jsonify({'error': 'Missing header', 'response':None}), 401 
 
-    if not auth or not auth.get('email') or not auth.get('password'): 
-        return jsonify({'error':'Missing email or password', 'response': None}), 401 
-    
     user = read(email=auth.get('email'), user=True) 
 
     if not user: 
@@ -89,11 +88,11 @@ def logout(current_user):
 @users.route('/signup', methods =['POST']) 
 def signup(): 
     try:
-        data = request.form
-    except:
         data = request.get_json()
-    username, email, password = data.get('username'), data.get('email'), data.get('password') 
-
+        username, email, password = data.get('username'), data.get('email'), data.get('password') 
+    except:
+        return jsonify({'error': 'Missing header', 'response': None}), 401 
+    
     # checking for existing user 
     user = read(email=data.get('email'), user=True)
     if username and email and password:
@@ -120,18 +119,19 @@ def signup():
 @token_required
 def update_data_of_user(current_user):
     try:
-        data = request.form
-    except:
         data = request.get_json()
-    for key in data.keys():
-        for value in data.getlist(key):
-            if(key=='password'):
-                value = generate_password_hash(value)
-            if update(field=key, new_value=value, current_user=current_user):
+    except:
+        return jsonify({'error': 'Missing header', 'response':None}), 401 
+    try:
+        for item in data:
+            if(item=='password'):
+                data[item] = generate_password_hash(data[item])
+            if update(field=item, new_value=data[item], current_user=current_user):
                 return jsonify({'response':'Succesfully updated', 'error':None}), 200
             else:
                 return jsonify({'error':'Something went wrong', 'response':None}), 403
-    return jsonify({'error': 'Not data for update', 'response': None}), 401
+    except:
+        return jsonify({'error': 'Not data for update', 'response': None}), 401
 
 
 # delete user with id

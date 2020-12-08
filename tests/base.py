@@ -36,8 +36,8 @@ class BaseTestCase(TestCase):
         """
         return self.client.post(
             '/user/signup',
-            # content_type='application/json',
-            data={'username':username, 'email':email, 'password':password})
+            content_type='application/json',
+            json={'username':username, 'email':email, 'password':password})
 
     def login_user(self, email='', password=''):
         """
@@ -46,7 +46,8 @@ class BaseTestCase(TestCase):
         """
         return self.client.post(
             '/user/login',
-            data={'email':email, 'password':password})
+            content_type='application/json',
+            json={'email':email, 'password':password})
 
     def get_user_token(self):
         """
@@ -67,3 +68,13 @@ class BaseTestCase(TestCase):
         return self.client.post(
             '/api/bledata/upload',
             data={'mac':mac, 'level':level, 'time': time})
+    
+    def upload_dummy_data(self):
+        """
+        Upload a few dummy data
+        :return:
+        """
+        self.upload_data(mac='11-22-33-44-55-66', level=-50, time='2020-11-10T16:17:25')
+        self.upload_data(mac='11-22-33-44-55-77', level=-60, time='2020-11-10T16:18:25')
+        self.upload_data(mac='11-22-33-44-55-88', level=-70, time='2020-11-10T16:19:25')
+        return True

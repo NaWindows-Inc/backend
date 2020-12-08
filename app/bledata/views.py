@@ -48,20 +48,26 @@ def get_one_page(current_user):
             return jsonify(result)
     elif request.method == 'POST':
         try:
-            data_mac = request.form
-        except:
             data_mac = request.get_json()
-        if data_mac.get('mac'):
-            all_data_mac = bleDataSchemaAll.dump(read(mac=data_mac.get('mac')))
-            result = []
-            for mac in all_data_mac:
-                result.append({
-                    'level': mac['level'],
-                    'time': mac['time'],
-                })
-            return jsonify({'items': result, 'error': None, 'totalCount': len(all_data_mac)}) 
-        else:
-            return jsonify({'error': 'Please, send mac address'}), 403
+            mac = data_mac.get('mac') 
+        except:
+            return jsonify({'error': 'Missing header', 'response':None}), 401
+        
+        if mac:
+            if re.match("[0-9a-f]{2}([-:]?)[0-9a-f]{2}(\\1[0-9a-f]{2}){4}$", mac.lower()):
+                all_data_mac = bleDataSchemaAll.dump(read(mac=mac))
+                result = []
+                for mac in all_data_mac:
+                    result.append({
+                        'level': mac['level'],
+                        'time': mac['time'],
+                    })
+                return jsonify({'items': result, 'error': None, 'totalCount': len(all_data_mac)}) 
+            else:
+                return jsonify({'error':'Wrong mac format'}), 403
+        
+            
+        
             
 
 
@@ -75,7 +81,6 @@ def add_one_data():
             data = request.get_json()
         except:
             data = ''
-            print("Upload without header")
     if data: 
         try:
             mac, level, time = data.get('mac'), int(data.get('level')), data.get('time') 
@@ -88,6 +93,7 @@ def add_one_data():
             response = -2
 
         if response != -1 and response != -2 :
+            print(str(mac)+ '  '+str(level)+'  '+str(time))
             return response
         elif response == -2:
             return jsonify({'error':'Wrong time format'}), 403
@@ -99,6 +105,7 @@ def add_one_data():
 
             response = upload_to_db(mac=mac, level=level, time=time)
             if response != -1:
+                print(str(mac)+ '  '+str(level)+'  '+str(time))
                 return response
             else:
                 return jsonify({'error':'Wrong mac format'}), 403 
@@ -107,8 +114,6 @@ def add_one_data():
 
 def upload_to_db(mac, level, time=''):
     if re.match("[0-9a-f]{2}([-:]?)[0-9a-f]{2}(\\1[0-9a-f]{2}){4}$", mac.lower()):
-        print(str(mac)+ '  '+str(level)+'  '+str(time))
-
         new_data = BleData(mac, level, time)
         response = create(new_data=new_data)
 

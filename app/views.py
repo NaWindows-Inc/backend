@@ -56,7 +56,7 @@ def not_found(error):
     :param e: Exception
     :return: Http Response
     """
-    return make_response(jsonify({'error':'not found page'}), 404)
+    return make_response(jsonify({'error':'Not found page'}), 404)
 
 
 @app.errorhandler(405)

@@ -6,6 +6,9 @@ import unittest
 import json
 
 class TestUserBluePrint(BaseTestCase):
+###
+### REGISTRATION TEST
+###
     def test_user_registration(self):
         """
         Test a user is successfully created through the api
@@ -85,7 +88,30 @@ class TestUserBluePrint(BaseTestCase):
             self.assertTrue(data['response'] == None)
             self.assertTrue(response.content_type == 'application/json')
             self.assertEqual(response.status_code, 202)
-    
+
+    def test_user_registration_with_missed_header(self):
+        """
+        Test a user registration with missed header content_type
+        :return:
+        """
+        with self.client:
+            response = self.client.post(
+                '/user/signup',
+                data={'username': 'test', 'email':'test@test.com', 'password':'test123'})
+            data = json.loads(response.data.decode())
+            print(data)
+            self.assertTrue(data['error'] == "Missing header")
+            self.assertTrue(data['response'] == None)
+            self.assertTrue(response.content_type == 'application/json')
+            self.assertEqual(response.status_code, 401)
+###
+### END REGISTRATION TEST
+###
+
+
+###
+### LOGIN TEST
+###
     def test_user_login_with_valid_data(self):
         """
         Test a user login with valid email and password
@@ -164,7 +190,14 @@ class TestUserBluePrint(BaseTestCase):
             self.assertTrue(data['error'] == 'Missing email or password')
             self.assertTrue(response.content_type == 'application/json')
             self.assertEqual(response.status_code, 401)
-    
+###
+### END LOGIN TEST
+###
+
+
+###
+### LOGOUT AND TOKEN TEST
+###
     def test_user_logout(self):
         """
         Test a user logout
@@ -214,7 +247,14 @@ class TestUserBluePrint(BaseTestCase):
             self.assertTrue(data['remaining'] is None)
             self.assertTrue(response.content_type == 'application/json')
             self.assertEqual(response.status_code, 402)
-    
+###
+### END LOGOUT AND TOKEN TEST
+###
+
+
+###
+### GET USER TEST
+###
     def test_get_all_users(self):
         """
         Test getting all users
@@ -282,7 +322,13 @@ class TestUserBluePrint(BaseTestCase):
             self.assertTrue(data['error'] == 'Wrong id')
             self.assertTrue(response.content_type == 'application/json')
             self.assertEqual(response.status_code, 403)
+###
+### END  GET USER TEST
+###
 
+###
+### UPDATE USER TEST
+###
     def test_user_update_password(self):
         """
         Test update password of user
@@ -293,7 +339,8 @@ class TestUserBluePrint(BaseTestCase):
         with self.client:
             response = self.client.put(
                 "/user/update",
-                data={'password':'new_password'},
+                content_type='application/json',
+                json={'password':'new_password'},
                 headers={'x-access-token':token})
             data = json.loads(response.data.decode())
             self.assertTrue(data['error'] is None)
@@ -311,7 +358,8 @@ class TestUserBluePrint(BaseTestCase):
         with self.client:
             response = self.client.put(
                 "/user/update",
-                data={'username':'new_username'},
+                content_type='application/json',
+                json={'username':'new_username'},
                 headers={'x-access-token':token})
             data = json.loads(response.data.decode())
             self.assertTrue(data['error'] is None)
@@ -329,7 +377,8 @@ class TestUserBluePrint(BaseTestCase):
         with self.client:
             response = self.client.put(
                 "/user/update",
-                data={'email':'new_email@gmail.com'},
+                content_type='application/json',
+                json={'email':'new_email@gmail.com'},
                 headers={'x-access-token':token})
             data = json.loads(response.data.decode())
             self.assertTrue(data['error'] is None)
@@ -347,7 +396,8 @@ class TestUserBluePrint(BaseTestCase):
         with self.client:
             response = self.client.put(
                 "/user/update",
-                data={'email':'new_email@gmail.com', "password":'new_password'},
+                content_type='application/json',
+                json={'email':'new_email@gmail.com', "password":'new_password'},
                 headers={'x-access-token':token})
             data = json.loads(response.data.decode())
             self.assertTrue(data['error'] is None)
@@ -365,7 +415,8 @@ class TestUserBluePrint(BaseTestCase):
         with self.client:
             response = self.client.put(
                 "/user/update",
-                data={'something':'new_email@gmail.com'},
+                content_type='application/json',
+                json={'something':'new_email@gmail.com'},
                 headers={'x-access-token':token})
             data = json.loads(response.data.decode())
             self.assertTrue(data['response'] is None)
@@ -389,7 +440,14 @@ class TestUserBluePrint(BaseTestCase):
             self.assertTrue(data['error'] == 'Not data for update')
             self.assertTrue(response.content_type == 'application/json')
             self.assertEqual(response.status_code, 401)
+###
+### END UPDATE USER TEST
+###
 
+
+###
+### DELETE USER TEST
+###
     def test_user_delete_by_id(self):
         """
         Test delete the user by id
@@ -447,3 +505,6 @@ class TestUserBluePrint(BaseTestCase):
             self.assertTrue(data['response'] is None)
             self.assertTrue(response.content_type == 'application/json')
             self.assertEqual(response.status_code, 403)
+###
+### END DELETE USER TEST
+###

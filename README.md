@@ -51,7 +51,3 @@
   ```
   pipenv run test
   ```
-- run test with coverage:
-  ```
-  pipenv run nosetests --with-coverage --cover-package=app
-  ```
