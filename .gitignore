@@ -3,9 +3,13 @@
 
 **/__pycache__
 
-text.txt
+
 Pipfile.lock
-**test.py
+
+test.py
+text.txt
+**test.pyc
+**__init__.pyc
 
 **/.env
 

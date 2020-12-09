@@ -1,5 +1,5 @@
 from app import app, db
-import view
+from app import views
 
 if __name__ == '__main__':
     app.run()
