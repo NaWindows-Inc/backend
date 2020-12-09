@@ -45,6 +45,15 @@
   pipenv run db migrate
   pipenv run db upgrade
   ```
+- upload bledata to database:
+  - change address if not default in [file](https://github.com/NaWindows-Inc/backend/blob/main/upload_data.py):
+    ```
+    6  address = "127.0.0.1:5000"
+    ```
+  - run script:
+    ```
+    pipenv run upload_data.py
+    ```
 
 ## Run tests
 - run tests without coverage:

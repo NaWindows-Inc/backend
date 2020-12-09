@@ -67,7 +67,8 @@ class BaseTestCase(TestCase):
         """
         return self.client.post(
             '/api/bledata/upload',
-            data={'mac':mac, 'level':level, 'time': time})
+            content_type='application/json',
+            json={'mac':mac, 'level':level, 'time': time})
     
     def upload_dummy_data(self):
         """

@@ -67,15 +67,11 @@ def get_one_page(current_user):
                 return jsonify({'error':'Wrong mac format'}), 403
         
             
-        
-            
-
-
 # upload data to db
 @bledata.route('/upload', methods=['POST'])
 def add_one_data():
     try:
-        data = request.form
+        data = request.json
     except:
         try:
             data = request.get_json()
@@ -102,7 +98,7 @@ def add_one_data():
     else:
         try:
             mac, time, level = request.json['mac'], request.json['time'], int(request.json['level'])
-
+            
             response = upload_to_db(mac=mac, level=level, time=time)
             if response != -1:
                 print(str(mac)+ '  '+str(level)+'  '+str(time))
